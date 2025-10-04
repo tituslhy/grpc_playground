@@ -6,10 +6,9 @@ import logging
 from todoService.protos import (
     todo_messages_pb2,
     todo_service_pb2,
-    todo_service_pb2_grpc,
-    todo_messages_pb2_grpc,
+    todo_service_pb2_grpc
 )
-from models.models import Todo, get_session
+from todoService.models.todo_models import Todo, get_session
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -40,6 +39,18 @@ class TodoServiceServicer(todo_service_pb2_grpc.TodoServiceServicer):
             todo.task = request.task
             session.commit()
             session.refresh(todo)
+            return todo_messages_pb2.Todo(
+                id=todo.id,
+                task=todo.task
+            )
+    
+    def GetTodo(self, request, context):
+        with get_session() as session:
+            todo = session.get(Todo, request.id)
+            if not todo:
+                context.set_code(grpc.StatusCode.NOT_FOUND)
+                context.set_details('Todo not found')
+                return todo_messages_pb2.Todo()
             return todo_messages_pb2.Todo(
                 id=todo.id,
                 task=todo.task

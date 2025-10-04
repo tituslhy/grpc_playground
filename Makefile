@@ -12,9 +12,9 @@ clean_hello_service:
 # Generates the todo service GRPC files
 generate_todo_service:
 	python -m grpc_tools.protoc \
-	-I=todoService/protos \
-	--python_out=todoService/protos \
-	--grpc_python_out=todoService/protos \
+	-I. \
+	--python_out=. \
+	--grpc_python_out=. \
 	todoService/protos/todo_messages.proto \
 	todoService/protos/todo_service.proto
 

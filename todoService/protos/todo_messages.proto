@@ -3,8 +3,25 @@ syntax = "proto3";
 package todos;
 
 message Todo {
-    int32 id = 1;
-    string task = 2;
+  int32 id = 1;
+  string task = 2;
+}
+
+message AddTodoRequest {
+  string task = 1;
+}
+
+message EditTodoRequest {
+  int32 id = 1;
+  string task = 2;
+}
+
+message TodoId {
+  int32 id = 1;
+}
+
+message RemoveTodoRequest {
+  int32 id = 1;
 }
 
 message Empty {}
