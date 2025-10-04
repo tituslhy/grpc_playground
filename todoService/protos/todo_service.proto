@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package todos;
+
+import "todo_messages.proto";
+
+service TodoService {
+    rpc AddTodo (AddTodoRequest) returns (Todo);
+    rpc EditTodo (EditTodoRequest) returns (Todo);
+    rpc ListTodos (Empty) returns (ListTodosResponse);
+    rpc RemoveTodo (RemoveTodoRequest) returns (RemoveTodoResponse);
+}
+
+message AddTodoRequest {
+    string task = 1;
+}
+
+message ListTodosResponse {
+    repeated Todo todos = 1;
+}
+
+message EditTodoRequest {
+    int32 id = 1;
+    string task = 2;
+}
+
+message RemoveTodoRequest {
+    int32 id = 1;
+}
+
+message RemoveTodoResponse {
+    bool success = 1;
+}

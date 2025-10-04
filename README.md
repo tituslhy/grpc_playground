@@ -6,3 +6,8 @@ Comparing gRPC against REST APIs
 ```
 make generate
 ```
+
+## Create the todos DB first:
+```
+python todoService/models/models.py
+```
