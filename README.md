@@ -4,7 +4,7 @@
     <img src="./images/gRPC and RestAPI.png" height = 600px>
 </p>
 
-This repository is a companion resource to an upcoming Medium Article.
+This repository is a companion resource to the Medium Article [A very simple introduction to gRPC](https://medium.com/@tituslhy/a-very-simple-introduction-to-grpc-6a666a039c03).
 
 ## Installing the requirements
 Using uv:
