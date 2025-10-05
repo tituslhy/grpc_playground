@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Path, Body
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 import asyncio
@@ -23,6 +24,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logging_lock = asyncio.Lock()
 
 tags_metadata = [
     {
@@ -62,6 +64,14 @@ app = FastAPI(
     openapi_tags=tags_metadata,
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], #specify this to be your frontend in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/health")
 async def health_check(tags=["System"]):
     """Health check endpoint"""
@@ -73,6 +83,7 @@ async def create_todo(todo: TodoCreate = Body(..., example={"task": "Buy groceri
     
     try:
         request = todo_messages_pb2.AddTodoRequest(task=todo.task)
+        logger.info(f"Creating Todo: {todo.task}")
         response = await app.state.grpc_stub.AddTodo(request)
         
         return TodoResponse(
@@ -100,14 +111,15 @@ async def create_todos_batch(batch: TodoCreateBatch = Body(..., example={"tasks"
         success_count = 0
         failed_count = 0
         
-        for response in responses:
-            if isinstance(response, Exception):
-                logger.error(f"Error creating todo: {response}")
-                results.append({"success": False, "error": str(response)})
-                failed_count += 1
-            else:
-                results.append({"success": True, "id": response.id, "task": response.task})
-                success_count += 1
+        async with logging_lock:
+            for response in responses:
+                if isinstance(response, Exception):
+                    logger.error(f"Error creating todo: {response}")
+                    results.append({"success": False, "error": str(response)})
+                    failed_count += 1
+                else:
+                    results.append({"success": True, "id": response.id, "task": response.task})
+                    success_count += 1
         
         return BatchResponse(
             success_count=success_count,
@@ -126,6 +138,7 @@ async def list_todos():
     try:
         request = todo_messages_pb2.Empty()  
         response = await app.state.grpc_stub.ListTodos(request)
+        logger.info("Listing todos...")
         todos = [
             TodoResponse(id=todo.id, task=todo.task)
             for todo in response.todos
@@ -142,6 +155,7 @@ async def get_todo(todo_id: int = Path(..., description="The ID of the todo to r
     
     try:
         request = todo_messages_pb2.TodoId(id=todo_id) 
+        logger.info(f"Getting Todo ID: {todo_id}")
         response = await app.state.grpc_stub.GetTodo(request)
         
         # Check if todo was found (empty response means not found)
@@ -164,6 +178,7 @@ async def update_todo(todo: TodoUpdate, todo_id: int = Path(..., description="Th
             id=todo_id,
             task=todo.task
         )
+        logger.info(f"Updating Todo ID: {todo_id} with task: {todo.task}")
         response = await app.state.grpc_stub.EditTodo(request)
         
         # Check if todo was found
@@ -198,11 +213,13 @@ async def delete_todos_batch(batch: TodoDeleteBatch = Body(..., example={"ids": 
         success_count = 0
         failed_count = 0
         
-        for response in responses:
-            if isinstance(response, Exception) or not response.success:
-                failed_count += 1
-            else:
-                success_count += 1
+        async with logging_lock:
+            for response in responses:
+                if isinstance(response, Exception) or not response.success:
+                    logger.info(f"Error deleting todo: {response}")
+                    failed_count += 1
+                else:
+                    success_count += 1
         
         return BatchResponse(
             success_count=success_count,
