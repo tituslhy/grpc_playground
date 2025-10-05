@@ -124,7 +124,7 @@ async def list_todos():
     """Gets all todo items"""
     
     try:
-        request = todo_messages_pb2.Empty()  # ✅ Fixed: use Empty()
+        request = todo_messages_pb2.Empty()  
         response = await app.state.grpc_stub.ListTodos(request)
         todos = [
             TodoResponse(id=todo.id, task=todo.task)
@@ -141,7 +141,7 @@ async def get_todo(todo_id: int = Path(..., description="The ID of the todo to r
     """Get a specific todo by ID"""
     
     try:
-        request = todo_messages_pb2.TodoId(id=todo_id)  # ✅ Fixed: use TodoId instead of GetTodoRequest
+        request = todo_messages_pb2.TodoId(id=todo_id) 
         response = await app.state.grpc_stub.GetTodo(request)
         
         # Check if todo was found (empty response means not found)
