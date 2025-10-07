@@ -6,7 +6,6 @@ import asyncio
 import grpc
 from todoService.protos import (
     todo_messages_pb2,
-    todo_service_pb2,
     todo_service_pb2_grpc,
 )
 from todoService.models.request_models import (
