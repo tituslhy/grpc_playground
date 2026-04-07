@@ -325,7 +325,14 @@ grpc_playground/
 
 ## Learning Resources
 
-This playground complements the Medium article [A very simple introduction to gRPC](https://medium.com/@tituslhy/a-very-simple-introduction-to-grpc-6a666a039c03).
+This playground is a companion to my Medium article:
+
+- [A very simple introduction to gRPC](https://medium.com/mitb-for-all/a-very-simple-introduction-to-grpc-6a666a039c03) — The theoretical foundation behind this code
+
+For more deep dives:
+- [gRPC Official Docs](https://grpc.io/docs/)
+- [Protocol Buffers Guide](https://protobuf.dev/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
 
 For more deep dives:
 - [gRPC Official Docs](https://grpc.io/docs/)
